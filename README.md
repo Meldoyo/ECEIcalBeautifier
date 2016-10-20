@@ -8,7 +8,7 @@ Télécharger la dernière version [ici](https://github.com/Meldoyo/ECEIcalBeaut
 
 ```java -jar ECEIcal.jar <URLDuFluxIcal> output.ics```
 
-Le code est à exécuter sur un serveur avec un refraîchissement régulier avec un accès web, genre dans un crontab sur un raspberry/machine de linux de l'école qui sont pas censés s'éteindre.
+Le code est à exécuter sur un serveur avec un rafraîchissement régulier avec un accès web, genre dans un crontab sur un raspberry/machine linux de l'école qui sont pas censés s'éteindre.
 
 
 ##Amélioration
