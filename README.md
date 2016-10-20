@@ -17,4 +17,4 @@ L'idéal serait d'ajouter des paramètres de personnalisation plus poussé, pour
 
 ###License
 
-Ce code utilise [biweekly](https://github.com/mangstadt/biweekly/) pour la lecture du flux ical et (OkHttp)[https://github.com/square/okhttp) pour le client HTTP
+Ce code utilise [biweekly](https://github.com/mangstadt/biweekly/) pour la lecture du flux ical et [OkHttp](https://github.com/square/okhttp) pour le client HTTP
