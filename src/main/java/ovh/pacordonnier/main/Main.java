@@ -16,31 +16,12 @@ import java.util.regex.Pattern;
  * Created by pcordonnier on 28/09/16.
  */
 public class Main {
-    public static void main(String[] args) {
-        ICalReader iCalReader = getIcal(args[0]);
-
-        if (iCalReader == null) {
-            System.out.println("Problem happend while getting the calendar");
-        }
-
-        try {
-            ICalendar iCalendar;
-            while ((iCalendar = iCalReader.readNext()) != null) {
-                for (VEvent event : iCalendar.getEvents()) {
-                    if (event.getLocation() != null) {
-                        event.setSummary(getECESummary(event.getSummary().getValue(), event.getLocation().getValue()));
-                        event.setLocation(getECELocation(event.getLocation().getValue()));
-                    }
-                }
-                iCalendar.write(new File(args[1]));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static String getECELocation(String location) {
         String eceBuildingNumber = getECEBuildingNumber(location);
+        if (eceBuildingNumber.equals("CNAM")) {
+            return "292 Rue Saint-Martin";
+        }
         switch (Integer.valueOf(eceBuildingNumber)) {
             case 1:
                 return "10 rue Sextius Michel";
@@ -58,6 +39,10 @@ public class Main {
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(location);
 
+        if (location.contains("CNAM")) {
+            return "CNAM";
+        }
+
         while (matcher.find()) {
             for (int i = 1; i <= matcher.groupCount(); i++) {
                 return matcher.group(i);
@@ -68,7 +53,6 @@ public class Main {
 
     public static String getECESummary(String summary, String location) {
         String[] split = summary.split(" - ");
-        String eceLocation = getECERoom(location);
         StringBuilder stringBuilder = new StringBuilder();
         if (startsWithING(split[0])) {
             stringBuilder.append(getECECourse(summary));
@@ -89,26 +73,20 @@ public class Main {
     }
 
     private static String getECERoom(String location) {
-        final String regex = "E\\d - ([^-]+) - ";
+        final String regex = "(E\\d|CNAM) - (.*?)( - |\\n|$)";
 
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(location);
-
-        matcher.find();
-
-        if (matcher.groupCount() == 1) {
-            return matcher.group(1);
-        } else if (matcher.groupCount() == 0) {
-            return "";
-        } else {
-            StringBuilder stringBuilder = new StringBuilder();
-            while (matcher.find()) {
-                for (int i = 1; i <= matcher.groupCount(); i++) {
-                    stringBuilder.append(matcher.group(i)).append(" - ");
-                }
-            }
-            return stringBuilder.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+//        System.out.println(location);
+        while (matcher.find()) {
+//            System.out.println(matcher.group(2));
+            stringBuilder.append(matcher.group(2));
+            stringBuilder.append(" - ");
         }
+        stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
+//        System.out.println(stringBuilder.toString().toString());
+        return stringBuilder.toString();
     }
 
     public static boolean startsWithING(String string) {
@@ -128,4 +106,30 @@ public class Main {
             return null;
         }
     }
+
+    public static void main(String[] args) {
+        ICalReader iCalReader = getIcal(args[0]);
+
+        if (iCalReader == null) {
+            System.out.println("Problem happend while getting the calendar");
+        }
+
+        try {
+            ICalendar iCalendar;
+            while ((iCalendar = iCalReader.readNext()) != null) {
+                for (VEvent event : iCalendar.getEvents()) {
+                    if (event.getLocation() != null) {
+                        event.setSummary(getECESummary(event.getSummary().getValue(), event.getLocation().getValue()));
+                        System.out.println("Summary :" + event.getSummary().getValue());
+                        event.setLocation(getECELocation(event.getLocation().getValue()));
+                        System.out.println("Location :" + event.getLocation().getValue());
+                    }
+                }
+                iCalendar.write(new File(args[1]));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
